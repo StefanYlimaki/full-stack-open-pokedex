@@ -1,8 +1,9 @@
 name: Periodic Healt Check
 
 on: 
+  workflow_dispatch:
   schedule: 
-  - cron: 15 * * * *
+  - cron: 5 * * * *
 
 jobs: 
   periodic_healt_check:
