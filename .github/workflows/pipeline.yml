@@ -57,20 +57,17 @@ jobs:
           details: build_lint_test failed!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   deploy_tag:
+    if: ${{ github.event_name == 'push' && contains(join(toJson(github.event.commits.*.message), ' '), '#skip') == false }}
     needs: [build_lint_test]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - name: deploying and tagging
+        uses: actions/checkout@v3
         with:
-          node-version: '16'
+          fetch-depth: 0
       - uses: superfly/flyctl-actions/setup-flyctl@master
-        if: ${{ github.event_name == 'push' && contains(join(toJson(github.event.commits.*.message), ' '), '#skip') == false }}
-      - name: flyctl
-        if: ${{ github.event_name == 'push' }}
-        run: flyctl deploy --remote-only
-      - uses: actions/checkout@v3
+      - run: flyctl deploy --remote-only
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' }}
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
